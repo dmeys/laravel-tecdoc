@@ -16,7 +16,7 @@
 
 You can install the package via [Composer](https://getcomposer.org/)
 ```bash
-composer require composite/laravel-tecdoc
+composer require dmeys/laravel-tecdoc
 ```
 
 In Laravel 5.5 or above the service provider will automatically get registered. In older versions of the framework just add the service provider in `config/app.php` file:
@@ -26,20 +26,20 @@ In Laravel 5.5 or above the service provider will automatically get registered. 
     /*
      * Package Service Providers...
      */
-    Composite\TecDoc\TecDocServiceProvider::class,
+    Dmeys\TecDoc\TecDocServiceProvider::class,
     ...
 ],
 
 'aliases' => [
     ...
-    'TecDoc' => Composite\TecDoc\Facades\TecDoc::class,
+    'TecDoc' => Dmeys\TecDoc\Facades\TecDoc::class,
     ...
 ],
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Composite\TecDoc\TecDocServiceProvider" --tag=config
+php artisan vendor:publish --provider="Dmeys\TecDoc\TecDocServiceProvider" --tag=config
 ```
 
 When published, [the `config/tecdoc.php` config](config/tecdoc.php) file contains:
