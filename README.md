@@ -26,20 +26,20 @@ In Laravel 5.5 or above the service provider will automatically get registered. 
     /*
      * Package Service Providers...
      */
-    Dmeys\TecDoc\TecDocServiceProvider::class,
+    Composite\TecDoc\TecDocServiceProvider::class,
     ...
 ],
 
 'aliases' => [
     ...
-    'TecDoc' => Dmeys\TecDoc\Facades\TecDoc::class,
+    'TecDoc' => Composite\TecDoc\Facades\TecDoc::class,
     ...
 ],
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Dmeys\TecDoc\TecDocServiceProvider" --tag=config
+php artisan vendor:publish --provider="Composite\TecDoc\TecDocServiceProvider" --tag=config
 ```
 
 When published, [the `config/tecdoc.php` config](config/tecdoc.php) file contains:
