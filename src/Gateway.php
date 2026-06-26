@@ -39,10 +39,10 @@ class Gateway
     }
 
     /**
-     * @param  string  $uri
-     * @param  array  $payload
-     *
+     * @param string $uri
+     * @param array $payload
      * @return array
+     * @throws Exception
      */
     public function get(string $uri, array $payload = []): array
     {
@@ -52,10 +52,10 @@ class Gateway
     }
 
     /**
-     * @param  string  $uri
-     * @param  array  $payload
-     *
+     * @param string $uri
+     * @param array $payload
      * @return array
+     * @throws Exception
      */
     public function post(string $uri, array $payload = []): array
     {
@@ -65,10 +65,10 @@ class Gateway
     }
 
     /**
-     * @param  string  $uri
-     * @param  array  $payload
-     *
+     * @param string $uri
+     * @param array $payload
      * @return array
+     * @throws Exception
      */
     public function put(string $uri, array $payload = []): array
     {
@@ -78,10 +78,10 @@ class Gateway
     }
 
     /**
-     * @param  string  $uri
-     * @param  array  $payload
-     *
+     * @param string $uri
+     * @param array $payload
      * @return array
+     * @throws Exception
      */
     public function delete(string $uri, array $payload = []): array
     {
@@ -91,11 +91,11 @@ class Gateway
     }
 
     /**
-     * @param  string  $method
-     * @param  string  $uri
-     * @param  array  $payload
-     *
+     * @param string $method
+     * @param string $uri
+     * @param array $payload
      * @return array
+     * @throws Exception
      */
     protected function request(string $method, string $uri, array $payload = []): array
     {
@@ -108,14 +108,15 @@ class Gateway
 
         $response = $this->client->request($method, $uri, array_merge($defaultOptions, $payload));
 
-        if (json_decode($response->getBody(), true)["status"]) {
-            if(json_decode($response->getBody(), true)["status"] != 200){
-                throw new Exception(json_decode($response->getBody(), true)["statusText"]);
-            } else if(isset(json_decode($response->getBody(), true)["data"]) &&  json_decode($response->getBody(), true)["data"] == ""){
+        $responseBody = json_decode($response->getBody(), true);
+        if ($responseBody["status"]) {
+            if($responseBody["status"] !== 200){
+                throw new Exception($responseBody["statusText"]);
+            } /*else if(empty($responseBody["data"])){ //todo AIM: risk place. TecDoc doesn't have authentic response format
                 throw new Exception("Empty response");
-            }
+            }*/
         }
             
-        return json_decode($response->getBody(), true);
+        return $responseBody;
     }
 }

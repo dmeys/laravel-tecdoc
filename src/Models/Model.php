@@ -17,9 +17,9 @@ abstract class Model
     /**
      * Return model object as Json object
      *
-     * @return void
+     * @return false|string
      */
-    public function toJson()
+    public function toJson(): bool|string
     {
         return json_encode($this);
     }

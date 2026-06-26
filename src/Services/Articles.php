@@ -4,11 +4,18 @@ namespace Composite\TecDoc\Services;
 
 use Composite\TecDoc\DTOs\Article\ArticleDTO;
 use Composite\TecDoc\Facades\TecDoc;
+use Composite\TecDoc\Mappers\Article\ArticleLinkageTargetDataMapper;
 use Composite\TecDoc\Models\Article\Article;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
 class Articles
 {
+    public function __construct(
+        protected ArticleLinkageTargetDataMapper $articleLinkageTargetMapper,
+    )
+    {
+    }
 
     /**
      * Get article ids with state
@@ -19,7 +26,7 @@ class Articles
      *  "linkingTargetId" => 26582, // Required (carId / motor id)
      *  "linkingTargetType" => "P",  // default is P (passenger car)
      *  "sort" => 1 // 1: by brand name, 2: by generic article name
-     *  "barandNo" => [ // optional
+     *  "brandNo" => [ // optional
      *      5,
      *      347,
      *      432
@@ -55,11 +62,11 @@ class Articles
      * $articleId = 599605873; // Required
      * $filter = [ // Optional
      *  'lang' => 'HU',
-     *  'attributs' => true,
+     *  'attributes' => true,
      *  'basicData' => true,
      *  'documents' => true,
      *  'eanNumbers' => true,
-     *  'immediateAttributs' => true,
+     *  'immediateAttributes' => true,
      *  'immediateInfo' => true,
      *  'info' => true,
      *  'mainArticles' => true,
@@ -72,11 +79,11 @@ class Articles
      *  'usageNumbers' => true,
      * ]
      *
-     * @param  int $articleId
-     * @param  array $filter
+     * @param int $articleId
+     * @param array|null $filter
      * @return Article
      */
-    public function find(int $articleId, array $filter = null)
+    public function find(int $articleId, array $filter = null): Article
     {
         $response = TecDoc::post('', $this->createFindPayload($articleId, $filter));
         return (new ArticleDTO())->createArticleModel($response);
@@ -104,21 +111,54 @@ class Articles
      * 
      * @param  mixed $articleNumber
      * @param  mixed $filter
-     * @return void
+     * @return array
      */
-    public function findByNumber(string $articleNumber, array $filter = null)
+    public function findByNumber(string $articleNumber, array $filter = null): array
     {
         $response = TecDoc::post('', $this->createFindByNumberPayload($articleNumber, $filter));
         return (new ArticleDTO())->mapArticleCollection($response);
     }
 
     /**
+     * Find vehicles, motors and axles of a manufacturer, which are linked to articles.
+     * This function can be used to lookup linkages for country groups but the article
+     * country must be set in addition.
+     *
+     *  $articleId = 599605873; // Required
+     *  $filter = [ // Optional
+     *   'country' => 'DE',
+     *   'countryGroupFlag' => false,
+     *   'lang' => 'HU',
+     *   'linkingTargetId' => -1,
+     *   'linkingTargetManuId' => 16,
+     *   'linkingTargetType' => 'P',
+     *   'withMainArticles' => true,
+     *  ]
+     *
+     * Linking target type:
+     * P: Passenger car
+     * O: Commercial vehicle
+     * M: Motor
+     * A: Axles
+     * K: Body type
+     *
+     * @param int $articleId
+     * @param array|null $filter
+     * @return Collection
+     */
+    public function findArticleLinkageTargets(int $articleId, array $filter = null): Collection
+    {
+        $response = TecDoc::post('', $this->articleLinkageTargetMapper->createArticleLinkageTargetsPayload($articleId, $filter));
+        return $this->articleLinkageTargetMapper->collectionFromResponse($response);
+    }
+
+    /**
      * Create get ids request payload for API calls
      *
      * @param  array $filter
-     * @return void
+     * @return array[]
      */
-    private function createIdsPayload(array $filter)
+    private function createIdsPayload(array $filter): array
     {
         return [
             "getArticleIdsWithState" => [
@@ -136,7 +176,12 @@ class Articles
         ];
     }
 
-    public function createFindPayload(int $articleId, array $filter = null)
+    /**
+     * @param int $articleId
+     * @param array|null $filter
+     * @return array[]
+     */
+    public function createFindPayload(int $articleId, array $filter = null): array
     {
         return [
             'getDirectArticlesByIds6' => [
@@ -166,7 +211,13 @@ class Articles
             ],
         ];
     }
-    public function createFindByNumberPayload(string $articleNumber, array $filter = null)
+
+    /**
+     * @param string $articleNumber
+     * @param array|null $filter
+     * @return array[]
+     */
+    public function createFindByNumberPayload(string $articleNumber, array $filter = null): array
     {
         return [
             'getArticleDirectSearchAllNumbersWithState' => [

@@ -4,22 +4,23 @@ namespace Composite\TecDoc\Services;
 
 use Composite\TecDoc\DTOs\Vehicle\VehicleDTO;
 use Composite\TecDoc\Facades\TecDoc;
+use Composite\TecDoc\Models\Vehicle\Vehicle;
 use Illuminate\Support\Facades\Config;
 
 class Vehicles
 {
     /**
      * Find vehicles by CarIds
-     * 
+     *
      * $filter = [ // optional
      *  "lang" => "HU", // default is in config file
      * ]
-     * 
-     * @param  int $carId
-     * @param  array $filter
+     *
+     * @param int $carId
+     * @param array|null $filter
      * @return Vehicle
      */
-    public function find(int $carId, array $filter = null)
+    public function find(int $carId, array $filter = null): Vehicle
     {
         $response = TecDoc::post('', $this->createFindPayload($carId, $filter));
         return (new VehicleDTO())->createVehicleModel($response);
@@ -27,37 +28,39 @@ class Vehicles
 
     /**
      * Get vehicle ids by criteria
-     * 
+     *
      * $manuId = 5;
      * $modId = 4955;
      * $filter = [ // optional
      *  "carType" => "P",  // default is P (passenger car)
      *  "lang" => "HU",  // default is in config file
      * ];
-     * 
+     *
      * carType options:
      *  P: Passenger car
      *  O: Commercial vehicle
      *  L: Light commercial vehicle
-     * 
-     * @param  int $manuId
-     * @param  int $modId
-     * @param  array $filter
+     *
+     * @param int $manuId
+     * @param int $modId
+     * @param array|null $filter
      * @return array
      */
-    public function findByNumber(int $manuId, int $modId, array $filter = null)
+    public function findByNumber(int $manuId, int $modId, array $filter = null): array
     {
-        $response = TecDoc::post('', $this->createfindByNumberPayload($manuId, $modId, $filter));
+        $response = TecDoc::post('', $this->createFindByNumberPayload($manuId, $modId, $filter));
         return (new VehicleDTO())->mapVehicleCollection($response);
     }
 
     /**
      * Create get ids request payload for API calls
      *
-     * @param  array $filter
-     * @return void
+     * @param int $manuId
+     * @param int $modId
+     * @param array|null $filter
+     * @return array[]
      */
-    private function createfindByNumberPayload(int $manuId, int $modId, array $filter = null)
+    private function createFindByNumberPayload(int $manuId, int $modId, array $filter = null): array
     {
         return [
             "getVehicleIdsByCriteria" => [
@@ -70,13 +73,15 @@ class Vehicles
             ]
         ];
     }
+
     /**
      * Create filter request payload for API calls
      *
-     * @param  array $filter
-     * @return void
+     * @param int $carId
+     * @param array|null $filter
+     * @return array[]
      */
-    private function createFindPayload(int $carId, array $filter = null)
+    private function createFindPayload(int $carId, array $filter = null): array
     {
         return [
             "getVehicleByIds3" => [

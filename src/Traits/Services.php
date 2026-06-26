@@ -5,6 +5,7 @@ namespace Composite\TecDoc\Traits;
 use Composite\TecDoc\Services\Addresses;
 use Composite\TecDoc\Services\Articles;
 use Composite\TecDoc\Services\AssemblyGroups;
+use Composite\TecDoc\Services\LinkageTarget;
 use Composite\TecDoc\Services\Manufacturers;
 use Composite\TecDoc\Services\ModelSeries;
 use Composite\TecDoc\Services\Vehicles;
@@ -12,7 +13,7 @@ use Composite\TecDoc\Services\Vehicles;
 trait Services
 {
     /**
-     * @return \Composite\TecDoc\Services\Manufacturers
+     * @return Manufacturers
      */
     public function manufacturers(): Manufacturers
     {
@@ -40,7 +41,7 @@ trait Services
      */
     public function articles(): Articles
     {
-        return new Articles;
+        return app(Articles::class);
     }
 
     /**
@@ -57,5 +58,13 @@ trait Services
     public function assemblyGroups(): AssemblyGroups
     {
         return new AssemblyGroups;
+    }
+
+    /**
+     * @return LinkageTarget
+     */
+    public function linkageTargets(): LinkageTarget
+    {
+        return app(LinkageTarget::class);
     }
 }

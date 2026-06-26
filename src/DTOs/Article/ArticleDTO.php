@@ -9,9 +9,9 @@ class ArticleDTO
 {
 
     /**
-     * Create article model model from array
+     * Create article model from array
      *
-     * @param  array $articleArray
+     * @param array $articleArray
      * @return Article
      */
     public function createArticleModel(array $articleArray): Article
@@ -41,19 +41,18 @@ class ArticleDTO
     /**
      * Map articles to array
      *
-     * @param  array $data
+     * @param array $data
      * @return array
      */
-    public function mapArticleCollection(array $data)
+    public function mapArticleCollection(array $data): array
     {
-        if (isset($data["data"]) && $data["data"]) {
-            $articles = [];
-            foreach ($data["data"]["array"] as $article) {
-                array_push($articles,
-                (new Articles())->find($article['articleId'])
-                );
-            }
-            return $articles;
+        $result = [];
+        $articles = $data['data']['array'] ?? [];
+
+        foreach ($articles as $article) {
+            $result[] = app(Articles::class)->find($article['articleId']);
         }
+
+        return $result;
     }
 }
